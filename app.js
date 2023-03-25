@@ -28,11 +28,15 @@ const addressModel = require("./modules/user/model/address-entity");
 // importing route for different modules below
 const userRoutes = require('./modules/user/router/user.routes');
 
+const masterMappingRoutes = require('./modules/mastermapping/routes/mastermapping.routes');
+
+
 
 const app = express()
 app.use(cors())
 app.use(bodyParser.json());
 app.use('/user',userRoutes)
+app.use('/master',masterMappingRoutes)
 const port = 3000
 
 

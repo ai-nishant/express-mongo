@@ -5,7 +5,7 @@ const addressSchema = new mongoose.Schema({
     addressId: { type: String },
     zipCode: { type: String, index: true },
     street: String,
-});
+}, { timestamps: { createdAt: 'created_at' } });
 
 addressSchema.pre('save', function (next) {
     // let addr = mongoose.model("address", addressSchema);
