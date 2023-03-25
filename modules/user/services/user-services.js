@@ -36,7 +36,6 @@ async function createUser(res) {
         }
         res.status(200).send({ output: "success", result: "successfully inserted values" })
     } catch (error) {
-
         res.status(400).send({ output: "error", error: error })
     }
 }
