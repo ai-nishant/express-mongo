@@ -10,7 +10,6 @@ const addressSchema = new mongoose.Schema({
 addressSchema.pre('save', function (next) {
     // let addr = mongoose.model("address", addressSchema);
     // addr.find().sort('-addressId').limit(1).then((res) => {
-    //     console.log(res,"ress address")
     //   this.addressId = res.length === 0 ? 1 : (Number(res[0].addressId)) + 1;
     //   next()
     // });

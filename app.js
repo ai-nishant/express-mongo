@@ -1,22 +1,11 @@
-
+// importing main modules 
 const express = require('express');
 const mongoose = require('mongoose');
-const app = express()
-const port = 3000
-
-// user model 
-const userModel = require("./modules/user/model/user-entity");
-const addressModel = require("./modules/user/model/address-entity");
-
+const cors = require('cors');
+const bodyParser = require('body-parser');
 // performance monitor
 
 
-const autocannon = require('autocannon')
-
-
-// dummy data
-const dummyUser = require("./modules/user/dummyuser");
-const dummyAddress = require("./modules/user/dummyAddress");
 // database connection 
 mongoose.connect('mongodb://localhost/factset', {
   useNewUrlParser: true,
@@ -30,13 +19,39 @@ mongoose.connect('mongodb://localhost/factset', {
   });
 
 
+// user model 
+const userModel = require("./modules/user/model/user-entity");
+const addressModel = require("./modules/user/model/address-entity");
+
+
+
+// importing route for different modules below
+const userRoutes = require('./modules/user/router/user.routes');
+
+
+const app = express()
+app.use(cors())
+app.use(bodyParser.json());
+app.use('/user',userRoutes)
+const port = 3000
+
+
+
+
+
+
+// dummy data
+const dummyUser = require("./modules/user/dummyuser");
+const dummyAddress = require("./modules/user/dummyAddress");
+
+
+
 app.get('/', async (req, res) => {
   for (let index = 0; index < 10000000; index++) {
     const address = await addressModel.create(dummyAddress());
     let addressIdValue = address.addressId.valueOf();
     let userObj = dummyUser();
     userObj.addresses[0].addressId = addressIdValue;
-    //    console.log(userObj,"dummyUser",addressIdValue);
     const result = await userModel.create(userObj);
   }
   res.status(200).send({ output: "success" })
@@ -49,7 +64,6 @@ app.get('/dummy', async (req, res) => {
     let addressIdValue = address.addressId.valueOf();
     let userObj = dummyUser();
     userObj.addresses[0].addressId = addressIdValue;
-    //    console.log(userObj,"dummyUser",addressIdValue);
     const result = await userModel.create(userObj);
   }
   res.status(200).send({ output: "success" })
@@ -87,11 +101,11 @@ app.post("/search", async (req, res) => {
     res.status(200).send({ output: q })
 
   } catch (error) {
-    console.log(error,"eror")
+
     res.status(400).send({ output: error })
   }
   } catch (error) {
-    console.log(error, "user err")
+   
     res.status(400).send({ output: error })
   }
 
