@@ -3,21 +3,21 @@ const mongoose = require('mongoose');
 // Define a user schema as per use case
 const mappingMasterSchema = new mongoose.Schema({
   collectionName: { type: String },
-  personId: {
-    type: Number,
-    min: 1,
-    max: 100000000
-  },
-  zipcodes: {
-    type: Number,
-    min: 1,
-    max: 100000000
-  },
-  addressIds: {
-    type: Number,
-    min: 1,
-    max: 100000000
-  },
+  personId: [{
+
+    min: String,
+    max: String
+  }],
+  zipcodes: [{
+
+    min: String,
+    max: String
+  }],
+  addressIds: [{
+
+    min: String,
+    max: String
+  }],
 }, { timestamps: { createdAt: 'created_at' } });
 
 

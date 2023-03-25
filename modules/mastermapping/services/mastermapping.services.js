@@ -1,6 +1,7 @@
 // importing models
 const masterMappingModel = require("../model/mapping-master-entity");
 
+const userModel = require('../../user/model/user-entity');
 const mongoose = require('mongoose');
 
 
@@ -13,33 +14,64 @@ const mongoose = require('mongoose');
 
 
 async function createCollectionMapping(res) {
-    try {       
+    try {
+        let findMinMax = await minMaxinCollection("person", "personId");
+        // await mongoose.model('person').aggregate([
+        //     {
+        //       $group: {
+        //         _id: null,
+        //         min: { $min: { $toInt: '$personId' } },
+        //         max: { $max: { $toInt: '$personId' } },
+        //       },
+        //     },
+        //   ]);
         // await mongoose.connection.db.createCollection('person_3');
         // await mongoose.connection.db.createCollection('address_3');
         let collectionList = await mongoose.connection.db.listCollections().toArray();
-        let persons =[];
+        let persons = [];
         let address = [];
-         collectionList.filter((i)=>{
-            if(i.name.startsWith('person')){
+        collectionList.filter(async (i) => {
+            if (i.name.startsWith('person')) {
+                console.log(i)
                 persons.push(i.name);
-            }else if(i.name.startsWith('address')){ 
+                let minMaxPerson = await minMaxinCollection("person", "personId");
+                let minMaxAddress = await minMaxinCollection("person", "addresses.addressId");
+                await insertNewMapping("person",minMaxPerson,minMaxAddress)
+                console.log(minMaxPerson,minMaxAddress,"==");
+            } else if (i.name.startsWith('address')) {
                 address.push(i.name);
-            }else{
-                console.log(i.name,"others")
+            } else {
+                console.log(i.name, "others")
             }
         });
 
 
-       
-        res.status(200).send({ output: "success", result: "successfully inserted values",list:{persons,address} })
+
+
+        res.status(200).send({ output: findMinMax, result: "successfully inserted values", list: { persons, address } })
     } catch (error) {
-        console.log(error,"errror")
+        console.log(error, "errror")
         res.status(400).send({ output: "error", error: error })
     }
 }
 
 
+async function insertNewMapping(name, minMaxPerson,minMaxAddress) {
+    try {
+        let mappingObj = {}
 
+        mappingObj.collectionName = name;
+        mappingObj.personId = { min: minMaxPerson[0].min, max:minMaxPerson[0].max };
+        mappingObj.addressIds = { min: minMaxAddress[0].min, max: minMaxAddress[0].max };
+
+        console.log(mappingObj, "obj")
+        const result = await masterMappingModel.create(mappingObj);
+        return result
+    } catch (error) {
+        console.log(error)
+        return error
+    }
+}
 async function updateCollectionCounter() {
     try {
 
@@ -58,11 +90,22 @@ async function findLastestActiveCollection(res) {
     }
 }
 
-async function minMaxinCollection(collectionName){
+async function minMaxinCollection(collectionName, keyname) {
     try {
-        
+        let key = keyname;
+        let findMinMax = await mongoose.model(collectionName).aggregate([
+            { $unwind: '$addresses' },
+            {
+                $group: {
+                    _id: null,
+                    min: { $min: { $toInt: `$${key}` } },
+                    max: { $max: { $toInt: `$${key}` } },
+                },
+            },
+        ]);
+        return findMinMax
     } catch (error) {
-        
+        return error
     }
 }
 

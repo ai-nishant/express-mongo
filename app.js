@@ -51,12 +51,16 @@ const dummyAddress = require("./modules/user/dummyAddress");
 
 
 app.get('/', async (req, res) => {
-  for (let index = 0; index < 10000000; index++) {
-    const address = await addressModel.create(dummyAddress());
+  for (let index = 0; index < 5; index++) {
+    let obj = dummyAddress();
+    let previousAddressCollectionCount = await mongoose.model('address').countDocuments();
+    let currentAddresCollectionCount = await mongoose.model("address_1").countDocuments();
+    console.log(obj,"obj")
+    // const address = await addressModel.create(dummyAddress());
     let addressIdValue = address.addressId.valueOf();
     let userObj = dummyUser();
     userObj.addresses[0].addressId = addressIdValue;
-    const result = await userModel.create(userObj);
+    // const result = await userModel.create(userObj);
   }
   res.status(200).send({ output: "success" })
 })
