@@ -3,8 +3,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-// performance monitor
-
 
 // database connection 
 mongoose.connect('mongodb://localhost/factset', {
@@ -23,11 +21,12 @@ mongoose.connect('mongodb://localhost/factset', {
 const userModel = require("./modules/user/model/user-entity");
 const addressModel = require("./modules/user/model/address-entity");
 
+// importing only schema
 
-
+const addressSchema = require('./modules/mastermapping/schemas/address-schema');
+const userSchema = require('./modules/mastermapping/schemas/user-schema');
 // importing route for different modules below
 const userRoutes = require('./modules/user/router/user.routes');
-
 const masterMappingRoutes = require('./modules/mastermapping/routes/mastermapping.routes');
 
 
@@ -35,6 +34,7 @@ const masterMappingRoutes = require('./modules/mastermapping/routes/mastermappin
 const app = express()
 app.use(cors())
 app.use(bodyParser.json());
+app.use('/search',userRoutes)
 app.use('/user',userRoutes)
 app.use('/master',masterMappingRoutes)
 const port = 3000
@@ -44,38 +44,11 @@ const port = 3000
 
 
 
-// dummy data
-const dummyUser = require("./modules/user/dummyuser");
-const dummyAddress = require("./modules/user/dummyAddress");
-
-
-
 app.get('/', async (req, res) => {
-  for (let index = 0; index < 5; index++) {
-    let obj = dummyAddress();
-    let previousAddressCollectionCount = await mongoose.model('address').countDocuments();
-    let currentAddresCollectionCount = await mongoose.model("address_1").countDocuments();
-    console.log(obj,"obj")
-    // const address = await addressModel.create(dummyAddress());
-    let addressIdValue = address.addressId.valueOf();
-    let userObj = dummyUser();
-    userObj.addresses[0].addressId = addressIdValue;
-    // const result = await userModel.create(userObj);
-  }
-  res.status(200).send({ output: "success" })
+  res.status(200).send({ output: "api to query 750 million records" })
 })
 
-app.get('/dummy', async (req, res) => {
-  for (let index = 0; index < 200; index++) {
-    const address = await addressModel.create(dummyAddress());
-    console.log(address,"address")
-    let addressIdValue = address.addressId.valueOf();
-    let userObj = dummyUser();
-    userObj.addresses[0].addressId = addressIdValue;
-    const result = await userModel.create(userObj);
-  }
-  res.status(200).send({ output: "success" })
-})
+
 
 app.post("/search", async (req, res) => {
   try {

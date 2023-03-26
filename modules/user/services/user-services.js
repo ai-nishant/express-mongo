@@ -2,11 +2,14 @@
 const userModel = require("../model/user-entity");
 const addressModel = require("../model/address-entity");
 
+
+
 // dummy data function
 
 // dummy data
 const dummyUser = require("../dummyuser");
 const dummyAddress = require("../dummyAddress");
+
 
 async function collectionLocation() {
     try {
@@ -16,7 +19,37 @@ async function collectionLocation() {
     }
 }
 
+async function combinedOutput(req,res){
+    try {
 
+        const { from, to, status, zipCodes, addressIds } = req.query;
+        console.log({from:from,to:to,status:status,zipcode:zipCodes,addressIds:addressIds})
+        let q = await userModel.aggregate([
+            {
+              $unwind: "$addresses"
+            },
+            {
+              $lookup:
+              {
+                from: "address",
+                localField: "addresses.addressId",
+                foreignField: "addressId",
+                as: "addressData"
+              }
+            },
+            
+            {
+              $limit: 10
+              
+            },
+           
+          ]);
+    return res.status(200).send(q)      
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send({error:error}) 
+    }
+}
 
 
 
@@ -51,11 +84,17 @@ async function deleteData() {
 }
 
 
-async function findOneUser(res) {
+async function findOneUser(res,req) {
     try {
-        console.log("payload")
-        res.status(200).send({ output: "success", result: "result" })
+       
+      
+        // Fetch data from MongoDB if not cached
+        const users = await userModel.find({_id:"641ed62a1f5f83f9bf587041"});
+      
+      
+        res.status(200).send({ output: "success", result: use })
     } catch (error) {
+        console.log(error,"error")
         res.status(400).send({ output: "success", result: "result" })
     }
 }
@@ -65,3 +104,5 @@ async function findOneUser(res) {
 
 exports.createUser = createUser;
 exports.findOne = findOneUser;
+
+exports.final = combinedOutput;

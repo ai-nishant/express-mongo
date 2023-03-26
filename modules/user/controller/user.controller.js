@@ -1,5 +1,9 @@
 const userServices = require('../services/user-services');
+// caching import redis
+const redis = require('redis');
+const util = require('util');
 
+// const redisSearchGet = util.promisify(redisConnection.get).bind(redisConnection);
 
 
 
@@ -15,34 +19,47 @@ async function createUser(req, res, next) {
 
 async function getUser(req, res, next) {
   try {
-    let payload = req.body;
+    // const redisConnection = redis.createClient({ host: 'localhost', port: 8080 });
+    // await redisConnection.connect();
+    // const redisSearchGet = util.promisify(redisConnection.get).bind(redisConnection);
+  
+    // const cacheKey = req.query;
+    // console.log(cacheKey);
+    // // Check if the data is cached
+    // const cacheResult = await redisSearchGet(cacheKey);
+    // console.log(cacheResult, "redis cache");
+    // if (cacheResult) {
+    //   const users = JSON.parse(cacheResult);
+    //   return res.send(users);
+    // } else {
+    //   let userResult = await userServices.final(req,res);
+    //   await redisSet(cacheKey, JSON.stringify(users), 'EX', 60 * 10); // Expires after 5 minutes
 
-    return await userServices.findOne(res);
+
+
+    //   return userResult;
+    // }
+    let userResult = await userServices.final(req,res);
+    return userResult;
+  } catch (error) {
+    console.log(error,"error")
+    res.status(400).send(error);
+  }
+}
+
+async function finalOutput(req, res, next) {
+  try {
+    const payload = req.body;
+    const id = req.query.id;
+    return await userServices.final(id, payload, res);
   } catch (error) {
     res.status(400).send(error);
   }
 }
 
-// async function updateUser(req, res, next) {
-//   try {
-//     const payload = req.body;
-//     const id = req.query.id;
-//     return await userServices.updateOneUser(id, payload, res);
-//   } catch (error) {
-//     res.status(400).send(error);
-//   }
-// }
 
-// async function deleteUser(req, res, next) {
-//   try {
-//     let payload = req.body.id;
-//     return await userServices.deleteOneUser(payload, res);
-//   } catch (error) {
-//     res.status(400).send(error);
-//   }
-// }
 
 exports.create = createUser;
 exports.get = getUser;
-// exports.update = updateUser;
+exports.finalOutput = finalOutput;
 // exports.delete = deleteUser;

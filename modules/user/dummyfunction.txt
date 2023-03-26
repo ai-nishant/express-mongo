@@ -1,0 +1,68 @@
+  try {
+    
+ 
+// dummy data
+const dummyUser = require("./modules/user/dummyuser");
+const dummyAddress = require("./modules/user/dummyAddress");
+
+
+
+  for (let index = 0; index < 100000; index++) {
+    let obj = dummyAddress();
+    let currentAddresCollectionModel = await mongoose.model("address_1",addressSchema);
+    let currentUserCollectionModel = await mongoose.model("person_1",userSchema);
+
+    let previousAddressCollectionCount = await addressModel.countDocuments();
+    let previousUserCollectionCount = await userModel.countDocuments();
+    
+    let currentAddresCollectionCount = await currentAddresCollectionModel.countDocuments();
+       
+    let currentUserCollectionCount = await currentUserCollectionModel.countDocuments();
+
+
+    obj.addressId = previousAddressCollectionCount + currentAddresCollectionCount+1;
+   
+    const address = await currentAddresCollectionModel.create(obj);
+    
+    let addressIdValue = address.addressId;
+    let userObj = dummyUser();
+    userObj.personId = previousUserCollectionCount + currentUserCollectionCount+1;
+    userObj.addresses[0].addressId = addressIdValue;
+    const result = await currentUserCollectionModel.create(userObj);
+    
+  }
+  res.status(200).send({ output:"oops success" })
+} catch (error) {
+    
+    res.status(400).send({ output:error })
+}
+  res.status(200).send({ output: "success" });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // new function 
+
+  app.get('/dummy', async (req, res) => {
+  for (let index = 0; index < 200; index++) {
+    const address = await addressModel.create(dummyAddress());
+    console.log(address,"address")
+    let addressIdValue = address.addressId.valueOf();
+    let userObj = dummyUser();
+    userObj.addresses[0].addressId = addressIdValue;
+    const result = await userModel.create(userObj);
+  }
+  res.status(200).send({ output: "success" })
+})
