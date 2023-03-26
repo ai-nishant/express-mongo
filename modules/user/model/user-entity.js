@@ -15,18 +15,13 @@ const userSchema = new mongoose.Schema({
     {
       from: String, // YYYY-MM-DD
       to: String, // YYYY-MM-DD, will be empty for current address
-      addressId: { type: String, index: true },
+      addressId:  { type: mongoose.Schema.Types.ObjectId, ref: 'address' },
     },
   ],
 }, { timestamps: { createdAt: 'created_at' } });
 
 
 userSchema.pre('save', function (next) {
-  // let User = mongoose.model("person", userSchema);
-  // User.find().sort('-personId').limit(1).then((res) => {
-  //   this.personId = res.length === 0 ? 1 : (Number(res[0].personId)) + 1;
-  //   next()
-  // });
   mongoose.model("person", userSchema).countDocuments().then((res) => {
     this.personId = res + 1;
     next()

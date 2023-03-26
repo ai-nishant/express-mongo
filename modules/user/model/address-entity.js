@@ -7,17 +7,12 @@ const addressSchema = new mongoose.Schema({
     street: String,
 }, { timestamps: { createdAt: 'created_at' } });
 
-addressSchema.pre('save', function (next) {
-    // let addr = mongoose.model("address", addressSchema);
-    // addr.find().sort('-addressId').limit(1).then((res) => {
-    //   this.addressId = res.length === 0 ? 1 : (Number(res[0].addressId)) + 1;
-    //   next()
-    // });
-    mongoose.model("address", addressSchema).countDocuments().then((res) => {
-        this.addressId = res + 1;
-        next()
-    });
-});
+// addressSchema.pre('save', function (next) {    ;
+//     mongoose.model("address", addressSchema).countDocuments().then((res) => {
+//         this.addressId = res + 1;
+//         next()
+//     });
+// });
 
 // exporting the mongoose.Collection
 

@@ -66,3 +66,21 @@ const dummyAddress = require("./modules/user/dummyAddress");
   }
   res.status(200).send({ output: "success" })
 })
+
+
+
+
+
+
+
+
+
+
+// user model 
+const userModel = require("./modules/user/model/user-entity");
+const addressModel = require("./modules/user/model/address-entity");
+
+// importing only schema
+
+const addressSchema = require('./modules/mastermapping/schemas/address-schema');
+const userSchema = require('./modules/mastermapping/schemas/user-schema');

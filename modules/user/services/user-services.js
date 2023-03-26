@@ -36,7 +36,7 @@ async function combinedOutput(req, res) {
         var addressorZipcode = {};
         if (addressIds) {
             addressorZipcode = {
-                "addressData.addressId": {
+                "addressData._id": {
                     $in: addressIds.split(",")
                 }
             }
@@ -51,9 +51,9 @@ async function combinedOutput(req, res) {
             status: statusQuery, addressIdQuery: addressorZipcode
         })
         let q = await userModel.aggregate([
-            // {
-            //     $unwind: "$addresses"
-            // },
+            {
+                $unwind: "$addresses"
+            },
             {
                 $match: statusQuery
             },
@@ -62,7 +62,7 @@ async function combinedOutput(req, res) {
                 {
                     from: "address",
                     localField: "addresses.addressId",
-                    foreignField: "addressId",
+                    foreignField: "_id",
                     as: "addressData"
                 }
             },
@@ -101,11 +101,13 @@ async function combinedOutput(req, res) {
 
 
 
-async function createUser(res) {
+async function createUser(res,payload) {
     try {
-        for (let index = 0; index < 10; index++) {
+        const noOfRecords = payload !=0 ? payload.records:100 ;
+        console.log(noOfRecords)
+        for (let index = 0; index < noOfRecords; index++) {
             const address = await addressModel.create(dummyAddress());
-            let addressIdValue = address.addressId.valueOf();
+            let addressIdValue = address._id.valueOf();
             let userObj = dummyUser();
             userObj.addresses[0].addressId = addressIdValue;
             const result = await userModel.create(userObj);
@@ -118,11 +120,32 @@ async function createUser(res) {
 
 
 
-async function deleteData() {
+async function collectionReport(res) {
     try {
+        let personDuplication = await userModel.aggregate([
+            { $group: { _id: "$personId", count: { $sum: 1 } } },
+            { $match: { count: { $gt: 1 } } }
+          ]);
+        
+          let addressDuplication = await addressModel.aggregate([
+            { $group: { _id: "$addressId", count: { $sum: 1 } } },
+            { $match: { count: { $gt: 1 } } }
+          ]);
+        
+        
+          let maxAddressId = await addressModel.find().collation({ locale: "en_US", strength: 2 }).sort({addressId:-1}).limit(1);
+          let maxPersonid = await userModel.find().collation({ locale: "en_US", strength: 2 }).sort({personId:-1}).limit(1);
+          let maxIds = {
+            addr:maxAddressId[0].addressId,person:maxPersonid[0].personId
+          }
+        
+          let total  = await userModel.countDocuments();
+          let totalAdd = await addressModel.countDocuments();
+          res.status(200).send({ output: "success" ,totalRecords:{user:total,address:totalAdd},duplicate:{person:personDuplication,address:addressDuplication},max:maxIds})
+        
 
     } catch (error) {
-
+        res.status(400).send({error:error})
     }
 }
 
