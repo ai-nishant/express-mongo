@@ -20,9 +20,7 @@ async function collectionLocation() {
 }
 
 async function combinedOutput(req, res) {
-    try {
-        // await addressModel.deleteManyMany({zipCode:"900002"})
-       
+    try {           
         const { from, to, status, zipCodes, addressIds } = req.query;
         console.log({ from: from, to: to, status: status, zipcode: zipCodes, addressIds: addressIds });
 
@@ -82,7 +80,7 @@ async function combinedOutput(req, res) {
                 }
             },
             {
-                $limit: 10
+                $limit: 1
 
             },
 

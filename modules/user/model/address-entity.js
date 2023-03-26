@@ -7,12 +7,12 @@ const addressSchema = new mongoose.Schema({
     street: String,
 }, { timestamps: { createdAt: 'created_at' } });
 
-// addressSchema.pre('save', function (next) {    ;
-//     mongoose.model("address", addressSchema).countDocuments().then((res) => {
-//         this.addressId = res + 1;
-//         next()
-//     });
-// });
+addressSchema.pre('save', function (next) {    ;
+    mongoose.model("address", addressSchema).countDocuments().then((res) => {
+        this.zipCode = 400000 + res + 1;
+        next()
+    });
+});
 
 // exporting the mongoose.Collection
 

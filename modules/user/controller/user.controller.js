@@ -3,7 +3,14 @@ const userServices = require('../services/user-services');
 const redis = require('redis');
 const util = require('util');
 
-// const redisSearchGet = util.promisify(redisConnection.get).bind(redisConnection);
+const redisConnection = redis.createClient();
+(async () => {
+  redisConnection.on('error', (err) => console.log(err));
+  await redisConnection.connect();
+
+})();
+
+
 
 
 
@@ -19,31 +26,32 @@ async function createUser(req, res, next) {
 
 async function getUser(req, res, next) {
   try {
-    // const redisConnection = redis.createClient({ host: 'localhost', port: 8080 });
-    // await redisConnection.connect();
-    // const redisSearchGet = util.promisify(redisConnection.get).bind(redisConnection);
+
+    const redisSearchGet = util.promisify(redisConnection.get).bind(redisConnection);
+    const redisSearchSet = util.promisify(redisConnection.set).bind(redisConnection);
   
-    // const cacheKey = req.query;
-    // console.log(cacheKey);
-    // // Check if the data is cached
+    const cacheKey = JSON.stringify(req.query);
+    console.log(cacheKey,"query");
+    // Check if the data is cached
     // const cacheResult = await redisSearchGet(cacheKey);
-    // console.log(cacheResult, "redis cache");
-    // if (cacheResult) {
-    //   const users = JSON.parse(cacheResult);
-    //   return res.send(users);
-    // } else {
-    //   let userResult = await userServices.final(req,res);
-    //   await redisSet(cacheKey, JSON.stringify(users), 'EX', 60 * 10); // Expires after 5 minutes
-
-
-
-    //   return userResult;
-    // }
-    let userResult = await userServices.final(req,res);
-    return userResult;
+    cacheResult = false;
+    
+    if (cacheResult) {
+      const users = JSON.parse(cacheResult);
+      return res.status(200).send(users);
+    } else {
+      console.log(cacheResult, "redis cache");
+      let userResult = await userServices.final(req,res);
+      console.log(userResult,"userResult")
+     const setCache =  await redisSearchSet(cacheKey, JSON.stringify(userResult), 'EX', 60 * 100); // Expires after 5 minutes
+      console.log(setCache)
+      return userResult;
+      
+    }
+   
   } catch (error) {
     console.log(error,"error")
-    res.status(400).send(error);
+   return error
   }
 }
 

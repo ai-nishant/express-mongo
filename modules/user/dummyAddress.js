@@ -71,12 +71,10 @@ module.exports  = function generateAddress() {
       ];
       
             
-    let add = {
-
-    }
+    let add = {}
 
 
-    add.zipCode = indianPincodes[Math.floor(Math.random() * indianPincodes.length)];
+    // add.zipCode = indianPincodes[Math.floor(Math.random() * indianPincodes.length)];
     add.street = indianStreets[Math.floor(Math.random() * indianStreets.length)];
 
 
