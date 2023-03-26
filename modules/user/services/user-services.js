@@ -19,35 +19,78 @@ async function collectionLocation() {
     }
 }
 
-async function combinedOutput(req,res){
+async function combinedOutput(req, res) {
     try {
-
+        // await addressModel.deleteManyMany({zipCode:"900002"})
+       
         const { from, to, status, zipCodes, addressIds } = req.query;
-        console.log({from:from,to:to,status:status,zipcode:zipCodes,addressIds:addressIds})
+        console.log({ from: from, to: to, status: status, zipcode: zipCodes, addressIds: addressIds });
+
+        let statusQuery = {};
+        if (status.includes("dead")) {
+            statusQuery = { dod: { $exists: true } };
+        } else {
+            statusQuery = { dob: { $exists: true } };
+        }
+
+        var addressorZipcode = {};
+        if (addressIds) {
+            addressorZipcode = {
+                "addressData.addressId": {
+                    $in: addressIds.split(",")
+                }
+            }
+        } else {
+            addressorZipcode = {
+                "addressData.zipCode": {
+                    $in: zipCodes.split(",")
+                }
+            }
+        }
+        console.log({
+            status: statusQuery, addressIdQuery: addressorZipcode
+        })
         let q = await userModel.aggregate([
+            // {
+            //     $unwind: "$addresses"
+            // },
             {
-              $unwind: "$addresses"
+                $match: statusQuery
             },
             {
-              $lookup:
-              {
-                from: "address",
-                localField: "addresses.addressId",
-                foreignField: "addressId",
-                as: "addressData"
-              }
+                $lookup:
+                {
+                    from: "address",
+                    localField: "addresses.addressId",
+                    foreignField: "addressId",
+                    as: "addressData"
+                }
             },
-            
             {
-              $limit: 10
-              
+                $match: addressorZipcode
             },
-           
-          ]);
-    return res.status(200).send(q)      
+            {
+                $project: {
+                    "_id":-1,
+                    "personId": 1,
+                    "gender": 1,
+                    "dob": 1,
+                    "dod": 1,
+                    "name": 1,
+                    "addresses":1,
+                    "addressData":1
+                }
+            },
+            {
+                $limit: 10
+
+            },
+
+        ]);
+        return res.status(200).send(q)
     } catch (error) {
         console.log(error)
-        return res.status(400).send({error:error}) 
+        return res.status(400).send({ error: error })
     }
 }
 
@@ -59,7 +102,7 @@ async function combinedOutput(req,res){
 
 
 async function createUser(res) {
-    try {       
+    try {
         for (let index = 0; index < 10; index++) {
             const address = await addressModel.create(dummyAddress());
             let addressIdValue = address.addressId.valueOf();
@@ -84,17 +127,17 @@ async function deleteData() {
 }
 
 
-async function findOneUser(res,req) {
+async function findOneUser(res, req) {
     try {
-       
-      
+
+
         // Fetch data from MongoDB if not cached
-        const users = await userModel.find({_id:"641ed62a1f5f83f9bf587041"});
-      
-      
+        const users = await userModel.find({ _id: "641ed62a1f5f83f9bf587041" });
+
+
         res.status(200).send({ output: "success", result: use })
     } catch (error) {
-        console.log(error,"error")
+        console.log(error, "error")
         res.status(400).send({ output: "success", result: "result" })
     }
 }
