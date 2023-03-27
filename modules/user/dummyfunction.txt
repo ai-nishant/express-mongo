@@ -84,3 +84,229 @@ const addressModel = require("./modules/user/model/address-entity");
 
 const addressSchema = require('./modules/mastermapping/schemas/address-schema');
 const userSchema = require('./modules/mastermapping/schemas/user-schema');
+
+
+
+
+
+
+
+
+
+     let q = await userModel.aggregate([
+            {
+                $unwind: "$addresses"
+            },
+            {
+                $match: statusQuery
+            },
+            {
+                $lookup:
+                {
+                    from: "address",
+                    localField: "addresses.addressId",
+                    foreignField: "_id",
+                    as: "addressData"
+                }
+            },
+            {
+                $match: addressorZipcode
+            },
+            {
+                $project: {
+                    "_id": -1,
+                    "personId": 1,
+                    "gender": 1,
+                    "dob": 1,
+                    "dod": 1,
+                    "name": 1,
+                    "addresses": 1,
+                    "addressData": 1
+                }
+            },
+            {
+                $limit: 1
+
+            },
+
+        ]);
+
+
+          try {
+        const t = await trying(req,res)
+        const { from, to, status, zipCodes, addressIds } = req.query;
+        console.log(t,"ttttttt");
+
+        var statusQuery = {};
+        if (status.includes("dead")) {
+            statusQuery = { dod: { $exists: true } };
+        } else if(status.includes("living")){
+            statusQuery = { dob: { $exists: true } };
+        }else{
+            statusQuery :{}
+        }
+
+        var addressorZipcode = {};
+        if (addressIds) {
+            addressorZipcode = {
+                "addressData._id": {
+                    $in: addressIds.split(",")
+                }
+            }
+        } else {
+            addressorZipcode = {
+                "addressData.zipCode": {
+                    $in: zipCodes.split(",")
+                }
+            }
+        }
+        console.log({
+            status: statusQuery, addressIdQuery: addressorZipcode
+        })
+        // let q = await userModel.find({"addresses.addressId":"642196086e86030464b2dcb2"});
+        // let q = await userModel.aggregate([
+        //     {
+        //         $match:$statusQuery
+        //     },{
+        //         $limit:5
+        //     }
+        // ]);
+        return res.status(200).send({t})
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send({ error: error })
+    }
+
+
+
+
+
+
+     "addresses": [
+                {
+                    "from": "1986-04-23",
+                    "to": "1986-04-23",
+                    "addressId": "6420cbebd546099ee152d124",
+                    "_id": "6420cbebd546099ee152d128"
+                },
+                {
+                    "from": "1986-04-23",
+                    "to": "1986-04-23",
+                    "addressId": "6420cbebd546099ee152d124",
+                    "_id": "6420cbebd546099ee152d128"
+                },
+                {
+                    "from": "1986-04-23",
+                    "to": "1986-04-23",
+                    "addressId": "6420cbebd546099ee152d124",
+                    "_id": "6420cbebd546099ee152d128"
+                }
+            ],
+
+
+
+     "addresses": [
+                {
+                    "from": "1986-04-23",
+                    "to": "1986-04-23",
+                    "addressId": "6420cbebd546099ee152d124",
+                    "_id": "6420cbebd546099ee152d128"
+                },
+                {
+                    "from": "1986-04-23",
+                    "to": "1986-04-23",
+                    "addressId": "6420cbebd546099ee152d124",
+                    "_id": "6420cbebd546099ee152d128"
+                },
+               
+            ],
+
+        all of user in all of address 
+
+100 * 3 * 10 = 3000
+            addresses.addressId            
+            addresses.addressId            
+            addresses.addressId
+
+
+
+            a intersection b
+
+
+
+
+
+// in collection 1[40000-80000] and collection 2 [80000-2000000]
+
+
+
+pincode in string === 400000
+
+
+
+
+
+
+
+
+
+
+
+
+filters comparey collection vs collection
+
+primary -- user 
+second -- address 
+
+
+take response from user with filters in user i.e to from status 
+node loadtime == response 
+
+response to address 
+
+output -- all of res
+
+project  =name ==> [ashish,nishant]
+
+user -- 1000
+from & to ---> 10 
+status --> 10 as res 
+
+10 in collection 2 -->
+
+addressId $in []
+
+address Id --> ...input with remaining filters 
+
+
+
+
+
+
+select * from user 
+
+inner join address 
+on usr.addres.id = address.id 
+
+where 
+
+
+
+
+user -- 1000
+from & to ---> 100
+status --> 100 as res 
+
+10 in collection 2 --> 
+
+
+100  * adress * n ==> match
+let obj = {[
+    1..100]
+}
+
+
+addressModel.find extends customFunction (obj.ids){
+    1 1 2 state --> false delete obj[1]
+
+}

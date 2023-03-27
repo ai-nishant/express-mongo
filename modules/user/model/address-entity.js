@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-// Define a user schema as per use case
+// Define a address schema as per use case
 const addressSchema = new mongoose.Schema({
     addressId: { type: String,index:true },
     zipCode: { type: String, index: true },

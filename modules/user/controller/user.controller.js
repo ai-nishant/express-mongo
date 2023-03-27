@@ -3,7 +3,7 @@ const userServices = require('../services/user-services');
 const redis = require('redis');
 const util = require('util');
 
-const redisConnection = redis.createClient();
+const redisConnection = redis.createClient({host:process.env.REDIS_HOST,port:process.env.REDIS_PORT});
 (async () => {
   redisConnection.on('error', (err) => console.log(err));
   await redisConnection.connect();
@@ -42,9 +42,9 @@ async function getUser(req, res, next) {
     } else {
       console.log(cacheResult, "redis cache");
       let userResult = await userServices.final(req,res);
-      console.log(userResult,"userResult")
-     const setCache =  await redisSearchSet(cacheKey, JSON.stringify(userResult), 'EX', 60 * 100); // Expires after 5 minutes
-      console.log(setCache)
+      // console.log(userResult,"userResult")
+    //  const setCache =  await redisSearchSet(cacheKey, JSON.stringify(userResult), 'EX', 60 * 100); // Expires after 5 minutes
+    //   console.log(setCache)
       return userResult;
       
     }
