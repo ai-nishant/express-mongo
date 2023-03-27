@@ -47,7 +47,7 @@ async function combinedOutput(req, res) {
                 }
             }
         }
-      
+
         const q = await userModel.aggregate([
             {
                 $match: statusQuery
@@ -71,16 +71,57 @@ async function combinedOutput(req, res) {
             {
                 $match: addressorZipcode
             },
+            {
+                $addFields: {
+                    "personID":"$personId",
+                    "firstname": "$name.first",
+                    "lastname": "$name.last",
+                    "Age": {
+                        $subtract: [new Date(), new Date("$dob")],
+                        
+                    },
+                    "isAlive": {
+                        $cond: {
+                            if: { $eq: ["$dod", ""] },
+                            then: true,
+                            else: false
+                        }
+                    },
+                    "Addresses": {
+                        $map: {
+                            input: "$addresses.addressId",
+                            as: "addr",
+                            in: {
+                                "addressId": "$$addr._id",
+                                "zipCode": "$$addr.zipCode",
+                                "street": "$$addr.street",
+                                "isCurrent": {
+                                    $cond: {
+                                        if: { $eq: ["$addr.to", ""] },
+                                        then: true,
+                                        else: false
+                                    }
+                                },
+                            }
+                        }
+                    }
+
+                }
+            },
 
             {
                 $project: {
-                    "_id": -1,
-                    "personId": 1,
-                    "gender": 1,
-                    "dob": 1,
-                    "dod": 1,
-                    "name": 1,
-                    "addresses": 1,
+                    
+                    "personID": 1,
+                    "firstname": 1,
+                    "lastname": 1,
+                    "Age": 1,
+                    "isAlive": 1,
+                 
+                    "Address": 1,
+                    "_id": 1,
+                    'Addresses':1,
+                    
 
                 }
             },
@@ -112,7 +153,7 @@ async function combinedOutput(req, res) {
 async function createUser(res, payload) {
     try {
         const noOfRecords = payload != 0 ? payload.records : 100;
-        
+
         for (let index = 0; index < noOfRecords; index++) {
             const address = await addressModel.create(dummyAddress());
             let addressIdValue = address._id.valueOf();
