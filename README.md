@@ -32,19 +32,19 @@ In order to the insert the dummy records :
 
 use the follow curl call
 
-----startofcurcall-----    ignore this line 35
+`
 curl --location --request POST 'localhost:3000/search' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "records" :1000000
 }'
-----startofcurcall-----    ignore this line 41
+`
 
 
 In order to search the user or records use below curl call
 
-----startofcurcall-----    ignore this line 46
+`
 curl --location --request GET 'localhost:3000/search/final?from=1951-01-01&to=1970-01-01&status=@dead&zipCodes=800001'
-----startofcurcall-----    ignore this line 48
+`
 
 
