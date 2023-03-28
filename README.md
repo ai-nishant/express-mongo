@@ -48,3 +48,11 @@ curl --location --request GET 'localhost:3000/search/final?from=1951-01-01&to=19
 `
 
 
+
+
+************* TimeLine Details below *************
+
+1. brainstorming and solution approach defination ----  2-3 hour
+2. Database schema design and creation ---- 1 hour
+3. Data preparation and insertion of dummy data --- 5-6 hours for 22 lac records   [ `couldnt go beyond as cpu became slow`]
+4. Mongo query for get api as per use case  ---- 3-4 hours 
