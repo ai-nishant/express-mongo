@@ -4,7 +4,7 @@ const redis = require('redis');
 const util = require('util');
 
 
-
+let cacheSetting = process.env.CACHING
 
 
 
@@ -20,22 +20,15 @@ async function createUser(req, res, next) {
 
 async function getUser(req, res, next) {
   try {
-
-
-    let userCache = {}
-    const cacheResult = await redisCache(req,userCache);
-
-    console.log(cacheResult, "redis cache");
-
-    if (cacheResult ) {
-      const users = JSON.parse(getCachedData);
-      return res.status(200).send(users);
-    } else {
-      // console.log(cacheResult, "redis cache");
-      let userResult = await userServices.final(req, res);
-      res.status(200).send({ res: userResult })
-
+    if (cacheSetting) {
+      const cacheGetResult = await redisCacheGet(req, res);
     }
+    let userResult = await userServices.final(req, res);
+    if (cacheSetting) {
+      let cacheSetResult = await redisCacheSet(req, userResult);
+    }
+    res.status(200).send({ res: userResult });
+
 
   } catch (error) {
     return error
@@ -54,12 +47,11 @@ async function finalOutput(req, res, next) {
 
 
 
-async function redisCache(req,userResult) {
+async function redisCacheGet(req, res) {
   try {
     const redisConnection = await redis.createClient({ host: process.env.REDIS_HOST, port: process.env.REDIS_PORT });
-    // await redisConnection.connect();
     (async () => {
-      redisConnection.on('error', (err) => console.log(err,"noconnection in redis"));
+      redisConnection.on('error', (err) => console.log(err, "noconnection in redis"));
       await redisConnection.connect();
 
     })();
@@ -68,16 +60,40 @@ async function redisCache(req,userResult) {
 
     let tempKey = JSON.stringify(req.query);
     const getCachedData = await redisConnection.get(tempKey);
-    console.log(getCachedData?Object.keys(getCachedData).length:"","data")
-    if(Object.keys(getCachedData).length > 2) return getCachedData;
+
+    if (getCachedData != null) {
+      const users = JSON.parse(getCachedData);
+      return res.status(200).send(users);
+    }
+    return getCachedData
+  } catch (error) {
+    return error
+  }
+}
+
+
+
+async function redisCacheSet(req, userResult) {
+  try {
+    const redisConnection = await redis.createClient({ host: process.env.REDIS_HOST, port: process.env.REDIS_PORT });
+    (async () => {
+      redisConnection.on('error', (err) => console.log(err, "noconnection in redis"));
+      await redisConnection.connect();
+
+    })();
+
+    // logic to get data
+
+    let tempKey = JSON.stringify(req.query);
+
 
     const setCachedData = await redisConnection.set(tempKey, JSON.stringify(userResult));
-      console.log(setCachedData,"set")
-      //  const setCache =  await redisSearchSet(cacheKey, JSON.stringify(userResult), 'EX', 60 * 100); // Expires after 5 minutes
-    return false;
-  } catch (error) {
 
-    console.log(error,"error")
+    return setCachedData
+
+  } catch (error) {
+    return error
+
   }
 }
 // exporting module
