@@ -20,6 +20,7 @@ async function createUser(req, res, next) {
 
 async function getUser(req, res, next) {
   try {
+    console.log(cacheSetting,"env setttingggggggggg")
     if (cacheSetting) {
       const cacheGetResult = await redisCacheGet(req, res);
     }
@@ -50,12 +51,17 @@ async function finalOutput(req, res, next) {
 async function redisCacheGet(req, res) {
   try {
     const redisConnection = await redis.createClient({ host: process.env.REDIS_HOST, port: process.env.REDIS_PORT });
-    (async () => {
+
+    redisConnection.on('connect', () => {
+      console.log('Connected to Redis');
+      
+    });
+   
+     (async () => {
       redisConnection.on('error', (err) => console.log(err, "noconnection in redis"));
       await redisConnection.connect();
 
     })();
-
     // logic to get data
 
     let tempKey = JSON.stringify(req.query);
@@ -76,6 +82,7 @@ async function redisCacheGet(req, res) {
 async function redisCacheSet(req, userResult) {
   try {
     const redisConnection = await redis.createClient({ host: process.env.REDIS_HOST, port: process.env.REDIS_PORT });
+    
     (async () => {
       redisConnection.on('error', (err) => console.log(err, "noconnection in redis"));
       await redisConnection.connect();
