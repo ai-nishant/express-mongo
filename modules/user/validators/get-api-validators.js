@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const searchApiValidations = Joi.object({
-  from:Joi.date().greater('1950-01-01'),
+  from:Joi.date().iso().min('1950-01-01'),
   to:Joi.date().iso().greater(Joi.ref("from")),
   status:Joi.string(),
   addressIds:Joi.string(),

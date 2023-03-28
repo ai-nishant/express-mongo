@@ -16,8 +16,6 @@ const mongoose = require('mongoose');
 async function combinedOutput(req, res) {
 
     try {
-
-
         const { from, to, status, zipCodes, addressIds } = req.query;
         // query formation
         var statusQuery = {};
@@ -97,7 +95,7 @@ async function combinedOutput(req, res) {
                                 "street": "$$addr.street",
                                 "isCurrent": {
                                     $cond: {
-                                        if: { $eq: ["$addr.to", ""] },
+                                        if: { $eq: ["$$addr.to", ""] },
                                         then: true,
                                         else: false
                                     }
@@ -136,7 +134,7 @@ async function combinedOutput(req, res) {
 
 
 
-        res.status(200).send({ success: q, testing: q.length })
+       return  q
     } catch (error) {
         console.log(error)
         res.status(200).send({ error: "helloworld" })
