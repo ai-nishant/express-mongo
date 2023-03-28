@@ -114,8 +114,7 @@ async function combinedOutput(req, res) {
                     "firstname": 1,
                     "lastname": 1,
                     "Age": 1,
-                    "isAlive": 1,
-                 
+                    "isAlive": 1,                 
                     "Address": 1,
                     "_id": 1,
                     'Addresses':1,
