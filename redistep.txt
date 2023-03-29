@@ -1,4 +1,12 @@
-the code for redis has been commented
+the code for redis has been commented, once configuration has been done please uncomment the redis  code
+
+look for below code snippet in two function named redisCacheSet() and redisCacheGet and uncomment once redis config is done
+
+  // (async () => {
+    //   redisConnection.on('error', (err) => console.log(err, "noconnection in redis"));
+    //   await redisConnection.connect();
+
+    // })();
 
 
 please follow the below to configure the redis 

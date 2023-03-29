@@ -16,7 +16,7 @@ const mongoose = require('mongoose');
 async function combinedOutput(req, res) {
 
     try {
-       
+
         const { from, to, status, zipCodes, addressIds } = req.query;
         // query formation
         var statusQuery = {};
@@ -72,13 +72,16 @@ async function combinedOutput(req, res) {
             },
             {
                 $addFields: {
-                    "personID":"$personId",
+                    "personID": "$personId",
                     "firstname": "$name.first",
                     "lastname": "$name.last",
                     "Age": {
-                        $subtract: [new Date(), new Date("$dob")],
-                        
-                    },
+                        "$dateDiff": {
+                          "startDate": new Date("$dob"),
+                          "endDate": "$$NOW",
+                          "unit": "year"
+                        }
+                      },
                     "isAlive": {
                         $cond: {
                             if: { $eq: ["$dod", ""] },
@@ -110,16 +113,16 @@ async function combinedOutput(req, res) {
 
             {
                 $project: {
-                    
+
                     "personID": 1,
                     "firstname": 1,
                     "lastname": 1,
                     "Age": 1,
-                    "isAlive": 1,                 
+                    "isAlive": 1,
                     "Address": 1,
                     "_id": 1,
-                    'Addresses':1,
-                    
+                    'Addresses': 1,
+
 
                 }
             },
@@ -127,14 +130,7 @@ async function combinedOutput(req, res) {
                 $limit: 10
             },
         ]).exec();
-
-
-
-
-
-        console.log(JSON.stringify(q),"qqqqqqq")
-
-       return  q
+        return q
     } catch (error) {
         console.log(error)
         res.status(200).send({ error: error })
