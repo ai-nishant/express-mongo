@@ -58,7 +58,7 @@ const dummyAddress = require("./modules/user/dummyAddress");
   app.get('/dummy', async (req, res) => {
   for (let index = 0; index < 200; index++) {
     const address = await addressModel.create(dummyAddress());
-    console.log(address,"address")
+ 
     let addressIdValue = address.addressId.valueOf();
     let userObj = dummyUser();
     userObj.addresses[0].addressId = addressIdValue;
@@ -135,7 +135,7 @@ const userSchema = require('./modules/mastermapping/schemas/user-schema');
           try {
         const t = await trying(req,res)
         const { from, to, status, zipCodes, addressIds } = req.query;
-        console.log(t,"ttttttt");
+
 
         var statusQuery = {};
         if (status.includes("dead")) {
@@ -160,9 +160,7 @@ const userSchema = require('./modules/mastermapping/schemas/user-schema');
                 }
             }
         }
-        console.log({
-            status: statusQuery, addressIdQuery: addressorZipcode
-        })
+
         // let q = await userModel.find({"addresses.addressId":"642196086e86030464b2dcb2"});
         // let q = await userModel.aggregate([
         //     {
