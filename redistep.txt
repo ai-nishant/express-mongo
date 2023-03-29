@@ -1,1 +1,14 @@
+the code for redis has been commented
+
+
 please follow the below to configure the redis 
+
+
+STEP 1 [installation]
+
+
+
+STEp 2 [redis configure]
+
+REDIS_HOST and REDIS_PORT are mentioned in .env file 
+Please change as per system configuration
