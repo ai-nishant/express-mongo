@@ -17,7 +17,7 @@ npm install --save
 
 Note {the redis installation is optional , steps are mentioned in `redissteps.txt` in root foolder}
 
-STEP 3 [Running the backend]
+STEP 3 [Running-the-backend]
 
 below command can be used to run backend server locally 
 
@@ -26,7 +26,7 @@ npm run start
 
 Note : change the path of mongo db server in .env file for error free run.
 
-
+`Database dump can be found in database folder or use following api to generate`
 
 In order to the insert the dummy records :
 
