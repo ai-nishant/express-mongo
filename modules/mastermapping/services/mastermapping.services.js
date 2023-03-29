@@ -31,17 +31,16 @@ async function createCollectionMapping(res) {
         let persons = [];
         let address = [];
         collectionList.filter(async (i) => {
-            if (i.name.startsWith('person')) {
-                console.log(i)
+            if (i.name.startsWith('person')) {               
                 persons.push(i.name);
                 let minMaxPerson = await minMaxinCollection("person", "personId");
                 let minMaxAddress = await minMaxinCollection("person", "addresses.addressId");
                 await insertNewMapping("person",minMaxPerson,minMaxAddress)
-                console.log(minMaxPerson,minMaxAddress,"==");
+                
             } else if (i.name.startsWith('address')) {
                 address.push(i.name);
             } else {
-                console.log(i.name, "others")
+              
             }
         });
 
@@ -50,7 +49,7 @@ async function createCollectionMapping(res) {
 
         res.status(200).send({ output: findMinMax, result: "successfully inserted values", list: { persons, address } })
     } catch (error) {
-        console.log(error, "errror")
+       
         res.status(400).send({ output: "error", error: error })
     }
 }
@@ -64,11 +63,11 @@ async function insertNewMapping(name, minMaxPerson,minMaxAddress) {
         mappingObj.personId = { min: minMaxPerson[0].min, max:minMaxPerson[0].max };
         mappingObj.addressIds = { min: minMaxAddress[0].min, max: minMaxAddress[0].max };
 
-        console.log(mappingObj, "obj")
+      
         const result = await masterMappingModel.create(mappingObj);
         return result
     } catch (error) {
-        console.log(error)
+       
         return error
     }
 }
@@ -83,7 +82,7 @@ async function updateCollectionCounter() {
 
 async function findLastestActiveCollection(res) {
     try {
-        console.log("payload")
+     
         res.status(200).send({ output: "success", result: "result" })
     } catch (error) {
         res.status(400).send({ output: "success", result: "result" })

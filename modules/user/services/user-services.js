@@ -77,11 +77,11 @@ async function combinedOutput(req, res) {
                     "lastname": "$name.last",
                     "Age": {
                         "$dateDiff": {
-                          "startDate": new Date("$dob"),
-                          "endDate": "$$NOW",
-                          "unit": "year"
+                            "startDate": new Date("$dob"),
+                            "endDate": "$$NOW",
+                            "unit": "year"
                         }
-                      },
+                    },
                     "isAlive": {
                         $cond: {
                             if: { $eq: ["$dod", ""] },
@@ -132,7 +132,7 @@ async function combinedOutput(req, res) {
         ]).exec();
         return q
     } catch (error) {
-        console.log(error)
+
         res.status(200).send({ error: error })
     }
 }
@@ -214,7 +214,7 @@ async function trying(req, res) {
             query['addresses.addressId'] = address._id;
         }
     }
-    console.log(query)
+
     // find the users based on the query criteria
     const users = await userModel.find(query).populate('addresses.addressId');
 
