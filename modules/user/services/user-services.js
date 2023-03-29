@@ -16,13 +16,14 @@ const mongoose = require('mongoose');
 async function combinedOutput(req, res) {
 
     try {
+       
         const { from, to, status, zipCodes, addressIds } = req.query;
         // query formation
         var statusQuery = {};
         if (status.includes("dead")) {
             statusQuery = { dod: { $exists: true } };
         } else if (status.includes("living")) {
-            statusQuery = { dob: { $exists: true } };
+            statusQuery = { dob: { $exists: false } };
         } else {
             statusQuery: { }
         }
@@ -95,7 +96,7 @@ async function combinedOutput(req, res) {
                                 "street": "$$addr.street",
                                 "isCurrent": {
                                     $cond: {
-                                        if: { $eq: ["$$addr.to", ""] },
+                                        if: { $eq: ["$addresses.to", ""] },
                                         then: true,
                                         else: false
                                     }
@@ -131,12 +132,12 @@ async function combinedOutput(req, res) {
 
 
 
-
+        console.log(JSON.stringify(q),"qqqqqqq")
 
        return  q
     } catch (error) {
         console.log(error)
-        res.status(200).send({ error: "helloworld" })
+        res.status(200).send({ error: error })
     }
 }
 

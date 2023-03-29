@@ -16,6 +16,6 @@ router.route('/')
     //   .put(userController.update)
     //   .delete(userController.delete)
 
-    router.route('/final')
-          .get(userController.finalOutput)
+//     router.route('/final')
+//           .get(userController.finalOutput)
 module.exports = router;
